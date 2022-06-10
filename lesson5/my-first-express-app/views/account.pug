@@ -1,0 +1,11 @@
+extends layout.pug
+
+block appContent
+    h1 Steve Panasuik
+    h2 You have: #{money}
+
+    if !recentTransaction
+      p No recent transactions
+    else 
+      p Recent transaction.
+    button Logout
