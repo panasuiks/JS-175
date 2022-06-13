@@ -47,6 +47,19 @@ app.get("/lists/new", (req, res) => {
   res.render("new-list")
 })
 
+app.get("/lists/:todoListID", (req, res, next) => {
+  let todoListID = req.params.todoListID;
+  let todoList = loadTodoListByID(+todoListID);
+  if (todoList === undefined) {
+    next(new Error("not found"));
+  } else {
+    res.render("list", {
+      todos: sortTodos(todoList.todos),
+      todoList
+    })
+  }
+});
+
 app.post("/lists", [
   body("todoListTitle")
     .trim()
@@ -76,11 +89,19 @@ app.post("/lists", [
       res.redirect("/lists");
     }
 
-  })
+  });
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(404).send(err.message);
+})
 
 app.listen(port, host, () => {
   console.log(`Todos is listening on port ${port} of ${host}`);
 })
+
+function loadTodoListByID(id) {
+  return todoLists.find(todoList => todoList.id === id)
+}
 
 function sortToDoLists(lists) {
   let finished = lists.filter(list => list.isDone())
@@ -91,10 +112,20 @@ function sortToDoLists(lists) {
 
   return [...unfinished, ...finished]
 }
+function sortTodos(todoList) {
+  let finished = todoList.filter(todo => todo.isDone())
+  let unfinished = todoList.filter(todo => !todo.isDone())
 
-function compareByTitle(todoListA, todoListB) {
-  let titleA = todoListA.title.toLowerCase();
-  let titleB = todoListB.title.toLowerCase();
+  finished.sort(compareByTitle);
+  unfinished.sort(compareByTitle);
+
+  return [...unfinished, ...finished]
+}
+
+
+function compareByTitle(itemA, itemB) {
+  let titleA = itemA.title.toLowerCase();
+  let titleB = itemB.title.toLowerCase();
   if (titleA > titleB) {
     return 1;
   }
