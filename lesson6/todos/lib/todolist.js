@@ -56,13 +56,7 @@ class TodoList {
   removeAt(index) {
     this._validateIndex(index);
     return this.todos.splice(index, 1);
-  }
-
-  toString() {
-    let title = `---- ${this.title} ----`;
-    let list = this.todos.map(todo => todo.toString()).join("\n");
-    return `${title}\n${list}`;
-  }
+  }Test
 
   forEach(callback) {
     this.todos.forEach(todo => callback(todo));
